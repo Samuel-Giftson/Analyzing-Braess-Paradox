@@ -10,7 +10,7 @@ from linear_threshold_model import LinearThresholdModel as lt
 
 
 
-#for i in range(50):
-#    my_simulating_object = simulating(10, 100, 10, testing=False)
+for i in range(50):
+    my_simulating_object = simulating(10, 100, 10, testing=False)
 
 

@@ -73,6 +73,9 @@ class SimulationStarter:
         self.all_bot_travel_time_average =[]
         self.ratio_of_bots_on_shortest_path_to_other_paths =[]
 
+        self.all_graphs_adjacency_matrix = np.array([])
+        self.all_graphs_adjacency_matrix_travel_time = np.array([])
+
         #Variable related to moving bots in the simulation from one node to another node
         self.start_epoch = 0
         self.max_epoch = 0
@@ -182,6 +185,10 @@ class SimulationStarter:
 
 
 #DATA COLLECTION, FUNCTIONS THAT ARE RELATED IN COLLECTING DATA, AND VISUALISING ARE HERE
+    #This function is meant to collect all the adjacency matrix of the graphs came in to use
+    def collect_adjacency_matrix(self)->None:
+        pass
+
     #This function is to display change of travel with respect to the addition of edges
     def show_data_after_simulation_finished(self)->None:
         #print(len(self.number_of_edge_list), len(self.temp_list_of_average_travel_time_of_spread_influence_funciton))
