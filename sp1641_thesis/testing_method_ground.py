@@ -1,37 +1,46 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
-from initialize_csv_file import DataStorage
-from scipy.sparse import csr_matrix
 import pandas as pd
 import numpy as np
+from initialize_csv_file import DataStorage
+from scipy.sparse import csr_matrix
+from graph_generator1 import GraphGenerator1 as gg
 
-G = nx.scale_free_graph(10)
-G = nx.DiGraph(G)
-G.remove_edges_from(nx.selfloop_edges(G))
-G.remove_nodes_from(nx.isolates(G))
-#Make graph Unidirectional
-for i in G.edges():
-    G[i[0]][i[1]]["weight"]= random.randint(10, 100)
+# Testing DataStorage class
+spectrum_dict = np.array([])
+all_average_travle_time = np.array([])
 
-for i in G.edges():
-    my_edge_reverse = (i[1], i[0])
-    if my_edge_reverse not in G.edges():
-        G.add_edge(my_edge_reverse[0], my_edge_reverse[1])
-        G[my_edge_reverse[0]][my_edge_reverse[1]]["weight"] = random.randint(10, 100)
-
-A = nx.adjacency_matrix(G, weight="weight")
-
-
-#G2 = nx.DiGraph(A)
-
-
+my_graph_object = gg(5, 100, 10)
+#
+G = my_graph_object.get_current_graph()
 my_data_storage_object = DataStorage()
-#initial_data = {"Initial Adjacency Matrix": [A], "Braess Adjacaency Matirx": [A],
-#                        "Amount of traffic": [1000], "Initial Average Time": [52], "Braess Average Time": [64],
-#                        "Graph Specturm": [A], "All average travel time": [[20, 30]]}
 
-#my_data_storage_object.add_data(initial_data)
+p="""
+epoch = len(G.edges())
+max_epoch = len(G.nodes()) * ((len(G.nodes())) - 1)
+
+while epoch < max_epoch:
+    spectrum_dict = np.append(spectrum_dict, my_data_storage_object.create_dict_representation(G))
+    all_average_travle_time = np.append(all_average_travle_time, random.randint(10, 100))
+
+    my_graph_object.add_edges_based_on_probability()
+    G = my_graph_object.get_current_graph()
+    epoch = len(G.edges())
+
+A = spectrum_dict[0]
+A1 = spectrum_dict[1]
+
+# G2 = nx.DiGraph(A)
+
+
+initial_data = {"Initial Adjacency Matrix": [A], "Braess Adjacency Matrix": [A],
+                "Amount of Traffic": [1000], "Initial Average Travel Time": [52], "Braess Average Travel Time": [64],
+                "Graph Spectrum": [spectrum_dict], "All Average Travel Time": [all_average_travle_time],
+                "Number of Nodes": len(G.nodes())}
+my_data_storage_object.add_data(initial_data)
+
+"""
 
 # TESTING THE EXISTING CSV FILE NOW
 my_data_storage_object.retrieve_data()
