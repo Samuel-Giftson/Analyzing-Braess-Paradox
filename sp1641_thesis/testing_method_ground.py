@@ -7,14 +7,38 @@ from initialize_csv_file import DataStorage
 from scipy.sparse import csr_matrix
 from graph_generator1 import GraphGenerator1 as gg
 
-# Testing DataStorage class
-spectrum_dict = np.array([])
-all_average_travle_time = np.array([])
 
-my_graph_object = gg(5, 100, 10)
+
+
+t = [23, 20, 17, 15, 10, 12, 0]
+
+
+# Find the first increasing number
+def find_first_increasing_element(arr):
+    prev_elem = arr[0]
+    prev_elem_idx = 0
+    increasing_elem = None
+    increasing_elem_idx = None
+
+    for idx, elem in enumerate(arr[1:], start=1):
+        if elem > prev_elem:
+            increasing_elem = elem
+            increasing_elem_idx = idx
+            break
+        prev_elem = elem
+        prev_elem_idx = idx
+
+    return prev_elem, prev_elem_idx, increasing_elem, increasing_elem_idx
+print(find_first_increasing_element(t))
+breakpoint()
+# Testing DataStorage class
+#spectrum_dict = np.array([])
+#all_average_travle_time = np.array([])
+
+#my_graph_object = gg(5, 100, 10)
 #
-G = my_graph_object.get_current_graph()
-my_data_storage_object = DataStorage()
+#G = my_graph_object.get_current_graph()
+#my_data_storage_object = DataStorage()
 
 p="""
 epoch = len(G.edges())

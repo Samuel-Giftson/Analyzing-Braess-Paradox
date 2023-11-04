@@ -5,13 +5,27 @@ import numpy as np
 import time
 import statistics
 
+#CUSTOM MADE CLASSES THAT ARE MADE FOR BRAESS PARADOX
+
 from braess_paradox_detector import BraessBaradoxDetector as bbd
-from graph_generator1 import GraphGenerator1 as gg
-from bot_class import CreateBOT as making_bots
-from linear_threshold_model import LinearThresholdModel as information_spread_model
+from graph_generator1 import GraphGenerator1 as gg #Class made to manipulate and change graphs
+from bot_class import CreateBOT as making_bots #Class made to creat bots
+from linear_threshold_model import LinearThresholdModel as information_spread_model #Class made to simulate the spread of information among bots
+from initialize_csv_file import DataStorage
+
+
+
 
 class SimulationStarter:
     def __init__(self, number_of_nodes=10, max_weight=0, min_weight=0, testing=False) -> None:
+        #Variables that are objects for the custom classes used in the simulation
+        self.my_data_storage_object = DataStorage()
+        self.my_graph_object= None
+        self.my_linear_threhold_model_object = None
+
+
+
+        #PARAMETERS REDEFINITION FOR TO OTHERS TO USE
         self.number_of_nodes = number_of_nodes
         self.max_weight = max_weight
         self.min_weight = min_weight
@@ -75,6 +89,17 @@ class SimulationStarter:
 
         self.all_graphs_adjacency_matrix = np.array([])
         self.all_graphs_adjacency_matrix_travel_time = np.array([])
+
+
+        self.graph_spectrum = np.array([])
+        self.graph_spectrum_travel_time = []
+        self.initial_travel_time=None
+        self.initial_travel_time_index=None
+        self.braess_travel_time = None
+        self.braess_travel_time_index = None
+
+
+
 
         #Variable related to moving bots in the simulation from one node to another node
         self.start_epoch = 0
@@ -194,6 +219,11 @@ class SimulationStarter:
         #print(len(self.number_of_edge_list), len(self.temp_list_of_average_travel_time_of_spread_influence_funciton))
         plt.plot(self.number_of_edge_list, self.temp_list_of_average_travel_time_of_spread_influence_funciton)
 
+
+        #Collecitng data to store in the csv file
+        self.graph_spectrum_travel_time = self.temp_list_of_average_travel_time_of_spread_influence_funciton
+
+
         plt.xlabel("Number of edges")
         plt.ylabel("Average Travel Time")
         plt.show()
@@ -263,6 +293,12 @@ class SimulationStarter:
 
 #------------------------------------------------# Main function that does the simulation-------------------------------------------------------------------#
     def start_doing_simulation(self)->None:
+
+        #Data collection
+        dict_representation_of_graph = self.my_data_storage_object.create_dict_representation(self.G)
+        self.graph_spectrum = np.append(self.graph_spectrum, dict_representation_of_graph)
+
+
 
         # We need the epoch to go till the graph becomes a complete graph.
         # The formula to obtain complete graph is num of edges = n(n-1)
@@ -507,6 +543,7 @@ class SimulationStarter:
 
         return None
 
+
     #As the graph grows, the number of paths increases. In a complete graph, the number of paths between is n!
     #n for being number of nodes, so this is activated to reduce the number of paths to test one, like the important paths
     #The shorter paths rather.
@@ -545,6 +582,61 @@ class SimulationStarter:
             print(
                 "weird issue has been achieved where the percent more value is the same as the fastest time yet the amount of paths has not been reduced")
             breakpoint()
+
+#FUNCTIONS TO COLLECT AND STORE APPROPRIATE DATA, IN THE CSV FILE BUILT FROM ANOTHER CLASS
+    
+
+
+    def store_data(self)->None:
+        user_answer = input("Store Data(Y/N): ")
+        answer_array = np.array(["Y", "N", "n", "y"])
+        #Ensuring user didn't type anything else
+        while user_answer not in answer_array:
+            print("Please type (Y/N), thank you. ")
+            print(" ")
+            user_answer = input("Store Data(Y/N): ")
+
+        if user_answer.upper() == "Y":
+            number_of_bots = input("Number of Bots in Experimnet: ")
+            number_of_nodes = input("Number of Nodes in Experiment: ")
+            experiment_name = number_of_bots+"BOTS"+number_of_nodes+"NODES"
+
+        return None
+
+    # Formatting the data gathered
+    def turn_data_to_proper_storage(self):
+        #Passing the list to find the braess paradox
+        self.initial_travel_time, self.initial_travel_time_index, self.braess_travel_time, self.braess_travel_time_index = self.find_first_increasing_element(self.graph_spectrum_travel_time)
+
+        return None
+
+    #Find the first increasing number
+    def find_first_increasing_element(self, arr):
+        prev_elem = arr[0]
+        prev_elem_idx = 0
+        increasing_elem = None
+        increasing_elem_idx = None
+
+        for idx, elem in enumerate(arr[1:], start=1):
+            if elem > prev_elem:
+                increasing_elem = elem
+                increasing_elem_idx = idx
+                break
+            prev_elem = elem
+            prev_elem_idx = idx
+
+        return prev_elem, prev_elem_idx, increasing_elem, increasing_elem_idx
+
+
+
+
+
+
+
+
+
+
+
 
 
 #TEST FUNCTIONS THAT WERE USED TO ENSURE THAT CODE WORKS

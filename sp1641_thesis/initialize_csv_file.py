@@ -8,6 +8,7 @@ from scipy.sparse import csr_matrix
 import re
 import os
 
+
 class DataStorage:
 
     def __init__(self):
@@ -19,13 +20,13 @@ class DataStorage:
         self.existing_df = pd.read_csv(self.file_path)
 
         self.columns_names = np.array(["Initial Adjacency Matrix", "Braess Adjacency Matrix", "Amount of Traffic", "Initial Average Travel Time", "Braess Average Travel Time",
-                                       "Graph Spectrum", "All Average Travel Time", "Number of Nodes"])
+                                       "Graph Spectrum", "All Average Travel Time", "Number of Nodes", "Experiment Name"])
 
 
     def __initialize_a_csv_file(self):
         initial_data = {"Initial Adjacency Matrix": [], "Braess Adjacency Matrix": [],
                         "Amount of Traffic": [], "Initial Average Travel Time": [], "Braess Average Travel Time": [],
-                        "Graph Spectrum": [], "All Average Travel Time": [], "Number of Nodes":[]}
+                        "Graph Spectrum": [], "All Average Travel Time": [], "Number of Nodes":[], "Experiment Name":[]}
 
         df = pd.DataFrame(initial_data)
         df.to_csv("simulation_data.csv", mode='a', index=False, header=True)
@@ -50,14 +51,15 @@ class DataStorage:
             dict_representation[i] = G[i[0]][i[1]]['weight']
         return dict_representation
 
-    def return_graph_from_dict_representation(self, G_dict):
+    def return_graph_from_dict_representation(self, G_dict:dict):
         G = nx.DiGraph()
-        for i in G_dict:
-            G.add_edge(i[0], i[1], weight = G_dict(i))
 
-        nx.draw(G)
+        for i in G_dict:
+            G.add_edge(i[0], i[1], weight = G_dict[i])
+
+        nx.draw(G, with_labels=True)
         plt.show()
-        breakpoint()
+
 
 
     #This function made to provide reference of how data is stored in the csv file.
@@ -73,6 +75,7 @@ class DataStorage:
         # "Graph Specturm": np.array([{edge->tuple:weight->int)}, {edge->tuple:weight->int)}]),
         # "All Average Travel Time": list->int,
         # "Number of Nodes": Int
+        # "Experiment Name": Int
         # }
 
         print("""
@@ -111,9 +114,19 @@ class DataStorage:
          -----The data in this column is a numpy array of all the graphs, where
          ----(The graph is store as a dictionary, Dict->{(edge):(edge_weight)})
         
-        Travel Time Associated with it.
+        All Average Travel Tim
+        --Travel Time Associated with it.
         ------Every Graph has an average travel time. 
         -----(The data in this column is stored as a list of integer)
+        
+        Number of Nodes
+        ------Number of nodes the graph has
+        
+        Experiment Name
+        -----Name of the experiment
+        ----It is named in the format follow NBOTSNNODES
+        ---The other two nodes except N from Nodes will be an integer. N bots dictates the number of bots, N nodes
+        ---dictates the number of nodes
         
         """)
 
@@ -121,12 +134,22 @@ class DataStorage:
 
     #Test code----------------------------TEST CODES AND FUNCTIONS
     def testing_if_data_stored_correctly(self, data_str):
-        print(self.columns_names[0], data_str[self.columns_names[0]])
-        print(self.columns_names[1], data_str[self.columns_names[1]])
-        print(self.columns_names[2], data_str[self.columns_names[2]])
-        print(self.columns_names[3], data_str[self.columns_names[3]])
-        print(self.columns_names[4], data_str[self.columns_names[4]])
-        print(self.columns_names[5], len(data_str[self.columns_names[5]]))
+        #self.return_graph_from_dict_representation(data_str[self.columns_names[0]])
+
+
+        def extract_dicts_from_string_array(string_array):
+            string = string_array[0]
+            dict_list = re.findall(r'{[^}]*}', string)
+            return np.array([eval(d) for d in dict_list])
+
+        # Example usage:
+        string_array = data_str[self.columns_names[5]].values
+        reconstructed_array = extract_dicts_from_string_array(string_array)
+
+        for i in reconstructed_array:
+            print(type(i))
+            self.return_graph_from_dict_representation(i)
+        breakpoint()
         print(self.columns_names[6], len(data_str[self.columns_names[6]]))
         print(self.columns_names[7], data_str[self.columns_names[7]])
         return None
