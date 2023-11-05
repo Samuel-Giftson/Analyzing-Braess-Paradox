@@ -1,8 +1,8 @@
 import networkx as nx
 import numpy as np
 import pandas as pd
-import networkx
 import matplotlib.pyplot as plt
+import ast
 
 from scipy.sparse import csr_matrix
 import re
@@ -19,14 +19,30 @@ class DataStorage:
 
         self.existing_df = pd.read_csv(self.file_path)
 
-        self.columns_names = np.array(["Initial Adjacency Matrix", "Braess Adjacency Matrix", "Amount of Traffic", "Initial Average Travel Time", "Braess Average Travel Time",
-                                       "Graph Spectrum", "All Average Travel Time", "Number of Nodes", "Experiment Name"])
-
+        self.columns_names = np.array(
+            ["Initial Adjacency Matrix",
+             "Braess Adjacency Matrix",
+             "Amount of Traffic",
+             "Initial Average Travel Time",
+             "Braess Average Travel Time",
+             "Graph Spectrum",
+             "All Average Travel Time",
+             "Number of Nodes",
+             "Experiment Name"]
+        )
 
     def __initialize_a_csv_file(self):
-        initial_data = {"Initial Adjacency Matrix": [], "Braess Adjacency Matrix": [],
-                        "Amount of Traffic": [], "Initial Average Travel Time": [], "Braess Average Travel Time": [],
-                        "Graph Spectrum": [], "All Average Travel Time": [], "Number of Nodes":[], "Experiment Name":[]}
+        initial_data = {
+            "Initial Adjacency Matrix": [],
+            "Braess Adjacency Matrix": [],
+            "Amount of Traffic": [],
+            "Initial Average Travel Time": [],
+            "Braess Average Travel Time": [],
+            "Graph Spectrum": [],
+            "All Average Travel Time": [],
+            "Number of Nodes": [],
+            "Experiment Name": []
+        }
 
         df = pd.DataFrame(initial_data)
         df.to_csv("simulation_data.csv", mode='a', index=False, header=True)
@@ -36,36 +52,65 @@ class DataStorage:
         update_df = self.existing_df.append(new_df, ignore_index=False)
         update_df.to_csv(self.file_path, index=False)
 
-    #This is used later to retrieve out for machine learning
+    # This is used later to retrieve out for machine learning
     def retrieve_data(self):
         df1 = pd.read_csv(self.file_path)
 
-        A = df1["Initial Adjacency Matrix"]
-        data_str = A[0]
-        self.testing_if_data_stored_correctly(df1)
+        #return df1
+        self.test_retrieval(df1)
+        #print(data_str)
+        #breakpoint()
+        #self.testing_if_data_stored_correctly(df1)
 
-    #Functions to translate graphs to storable data structure.
-    def create_dict_representation(self, G:networkx.classes.digraph.DiGraph) -> dict:
+    # FUNCTIONS TO TRANSLATE CSV DATA TO ORIGINIAL DATA STRUCTURE
+    def create_dict_representation(self, G: nx.classes.digraph.DiGraph) -> dict:
         dict_representation = {}
         for i in G.edges():
             dict_representation[i] = G[i[0]][i[1]]['weight']
         return dict_representation
 
-    def return_graph_from_dict_representation(self, G_dict:dict):
+    def return_graph_from_dict_representation(self, G_dict: dict):
         G = nx.DiGraph()
 
         for i in G_dict:
-            G.add_edge(i[0], i[1], weight = G_dict[i])
+            G.add_edge(i[0], i[1], weight=G_dict[i])
 
         nx.draw(G, with_labels=True)
         plt.show()
 
+    # FUNCTIONS THAT ARE USED TO TRANSLATE DATA STORED IN THE CSV FILE TO USABLE DATA
+
+    # This function is used to turn dicts from string Turning "Graph Spectrum"
+    def extract_dicts_from_string_array(self, string_array):
+        string = string_array[0]
+        dict_list = re.findall(r'{[^}]*}', string)
+        return np.array([eval(d) for d in dict_list])
 
 
-    #This function made to provide reference of how data is stored in the csv file.
-    def help_(self)->None:
-        #Reference for developer
-        #Below are columns.
+    #This function is used to convert an string in to numpy array, this is used for "All Average Travel Time" column.
+    def extract_numpy_array_from_string(self, s)->np.ndarray:
+
+        # Remove leading and trailing brackets and spaces
+        s = s.strip('[]').strip()
+
+        # Split the string using both '.' and ' ' as delimiters, convert to integers, and create a NumPy array
+        elements = [int(x) for x in s.replace(',', '').split('.') if x]  # Remove empty strings
+        arr = np.array(elements)
+
+        return arr
+
+    #This function is used to convert a string that has one dicitonary in it. It works for the columns named
+    #Initial Adjaceny Matrix and Braess Adjacency Matrix
+    def turn_one_dict_string_ino_dict(self, my_string):
+        output_dict = ast.literal_eval(my_string)
+
+        return output_dict
+
+
+    # This function made to provide reference of how data is stored in the csv file.
+    def help_(self) -> None:
+        # Reference for developer
+        # Below are columns.
         # initial_data = {
         # "Initial Adjacency Matrix": {edge->tuple:weight->int)}
         # "Braess Adjacency Matirx": {edge->tuple:weight->int)},
@@ -130,12 +175,55 @@ class DataStorage:
         
         """)
 
+    # Test code----------------------------TEST CODES AND FUNCTIONS
+    #Testing if data stored properly in the csv file
+    def test_retrieval(self, df):
+        for i in df[self.columns_names[0]]:
+            print(self.turn_one_dict_string_ino_dict(i))
+        print("column 0 finished")
+        print(" ")
+        for i in df[self.columns_names[1]]:
+            print(self.turn_one_dict_string_ino_dict(i))
+        print("column 1 finished")
+        print(" ")
+
+        for i in df[self.columns_names[2]]:
+            print(int(i))
+        print("Column 2 finished")
+        print(" ")
+
+        for i in df[self.columns_names[3]]:
+            print(float(i))
+        print("column 3 finished")
+        print(" ")
+
+        for i in df[self.columns_names[4]]:
+            print(float(i))
+        print("Column 4 finihsed")
+        print(" ")
 
 
-    #Test code----------------------------TEST CODES AND FUNCTIONS
+        t = df[self.columns_names[5]].values
+        for i in t:
+            print(type(i))
+            #print(self.extract_dicts_from_string_array(i))
+
+        print("Column 5 finished")
+        print(" ")
+
+
+        breakpoint()
+        print(self.extract_dicts_from_string_array(df[self.columns_names[5]].values))
+        breakpoint()
+        print(" ")
+        print(self.extract_numpy_array_from_string(df[self.columns_names[6]][0]))
+        print(df[self.columns_names[7]][0])
+        print(df[self.columns_names[8]][0])
+
+
+        return None
     def testing_if_data_stored_correctly(self, data_str):
-        #self.return_graph_from_dict_representation(data_str[self.columns_names[0]])
-
+        # self.return_graph_from_dict_representation(data_str[self.columns_names[0]])
 
         def extract_dicts_from_string_array(string_array):
             string = string_array[0]
@@ -144,7 +232,10 @@ class DataStorage:
 
         # Example usage:
         string_array = data_str[self.columns_names[5]].values
+        print(string_array)
         reconstructed_array = extract_dicts_from_string_array(string_array)
+        print(reconstructed_array)
+        breakpoint()
 
         for i in reconstructed_array:
             print(type(i))
@@ -153,6 +244,7 @@ class DataStorage:
         print(self.columns_names[6], len(data_str[self.columns_names[6]]))
         print(self.columns_names[7], data_str[self.columns_names[7]])
         return None
+
 
 
     def testing(self):
@@ -166,29 +258,8 @@ class DataStorage:
         updated_df = existing_df.append(new_df, ignore_index=False)
         updated_df.to_csv("t.csv", index=False)
 
-        #Testing code to see if it still works as existing df keeps file open
+        # Testing code to see if it still works as existing df keeps file open
         new_data1 = {"K": [23121], "L": [123132]}
         new_df1 = pd.DataFrame(new_data1)
         updated_df = existing_df.append(new_df1, ignore_index=False)
         updated_df.to_csv("t.csv", index=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

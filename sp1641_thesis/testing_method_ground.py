@@ -8,39 +8,19 @@ from scipy.sparse import csr_matrix
 from graph_generator1 import GraphGenerator1 as gg
 
 
-
-
-t = [23, 20, 17, 15, 10, 12, 0]
-
-
-# Find the first increasing number
-def find_first_increasing_element(arr):
-    prev_elem = arr[0]
-    prev_elem_idx = 0
-    increasing_elem = None
-    increasing_elem_idx = None
-
-    for idx, elem in enumerate(arr[1:], start=1):
-        if elem > prev_elem:
-            increasing_elem = elem
-            increasing_elem_idx = idx
-            break
-        prev_elem = elem
-        prev_elem_idx = idx
-
-    return prev_elem, prev_elem_idx, increasing_elem, increasing_elem_idx
-print(find_first_increasing_element(t))
-breakpoint()
-# Testing DataStorage class
-#spectrum_dict = np.array([])
-#all_average_travle_time = np.array([])
-
-#my_graph_object = gg(5, 100, 10)
-#
-#G = my_graph_object.get_current_graph()
-#my_data_storage_object = DataStorage()
+my_data_storage_object = DataStorage()
 
 p="""
+#Testing DataStorage class
+spectrum_dict = np.array([])
+all_average_travle_time = np.array([])
+
+my_graph_object = gg(5, 100, 10)
+#
+G = my_graph_object.get_current_graph()
+
+
+
 epoch = len(G.edges())
 max_epoch = len(G.nodes()) * ((len(G.nodes())) - 1)
 
@@ -61,10 +41,12 @@ A1 = spectrum_dict[1]
 initial_data = {"Initial Adjacency Matrix": [A], "Braess Adjacency Matrix": [A],
                 "Amount of Traffic": [1000], "Initial Average Travel Time": [52], "Braess Average Travel Time": [64],
                 "Graph Spectrum": [spectrum_dict], "All Average Travel Time": [all_average_travle_time],
-                "Number of Nodes": len(G.nodes())}
+                "Number of Nodes": len(G.nodes()), "Experiment Name":"test1"}
 my_data_storage_object.add_data(initial_data)
 
+#Testing, extract duct from a string
 """
+
 
 # TESTING THE EXISTING CSV FILE NOW
 my_data_storage_object.retrieve_data()
