@@ -106,6 +106,25 @@ class DataStorage:
 
         return output_dict
 
+    def column_five_element_translator(self, string_list):
+        my_returning_array = np.array([])
+        string_list = string_list.split("\n")
+
+        #Clean the array first element
+        string_list[0] = string_list[0].replace("[","")
+
+        #Clean last element
+        string_list[-1] = string_list[-1].replace("]","")
+
+        for i in string_list:
+            string_convereted = self.turn_one_dict_string_ino_dict(i)
+            my_returning_array = np.append(my_returning_array, string_convereted)
+
+        del string_list
+        return my_returning_array
+
+
+
 
     # This function made to provide reference of how data is stored in the csv file.
     def help_(self) -> None:
@@ -205,21 +224,23 @@ class DataStorage:
 
         t = df[self.columns_names[5]].values
         for i in t:
-            print(type(i))
-            #print(self.extract_dicts_from_string_array(i))
-
+            my_array = self.column_five_element_translator(i)
+            print(my_array)
         print("Column 5 finished")
         print(" ")
+        for i in df[self.columns_names[6]]:
+            print(self.extract_numpy_array_from_string(i))
 
-
-        breakpoint()
-        print(self.extract_dicts_from_string_array(df[self.columns_names[5]].values))
-        breakpoint()
+        print("Column 6 finished")
         print(" ")
-        print(self.extract_numpy_array_from_string(df[self.columns_names[6]][0]))
-        print(df[self.columns_names[7]][0])
-        print(df[self.columns_names[8]][0])
 
+        for i in df[self.columns_names[7]]:
+            print(i)
+        print("Column 7 finihsed")
+        print(" ")
+
+        for i in df[self.columns_names[8]]:
+            print(i)
 
         return None
     def testing_if_data_stored_correctly(self, data_str):
