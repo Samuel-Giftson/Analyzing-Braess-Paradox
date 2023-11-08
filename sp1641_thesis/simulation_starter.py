@@ -211,6 +211,7 @@ class SimulationStarter:
         plt.xlabel("Number of edges")
         plt.ylabel("Average Travel Time")
         plt.show()
+        self.store_data()
 
         return None
 
@@ -561,7 +562,8 @@ class SimulationStarter:
         if user_answer.upper() == "Y":
             number_of_bots = input("Number of Bots in Experimnet: ")
             number_of_nodes = input("Number of Nodes in Experiment: ")
-            experiment_name = number_of_bots + "BOTS" + number_of_nodes + "NODES"
+            experiment_number = input("What number experiment is this: ")
+            experiment_name = number_of_bots + "BOTS" + number_of_nodes + "NODES"+experiment_number+"EXPERIMENT"
             initial_adjacency_matrix = self.graph_spectrum[self.initial_travel_time_index]
             braess_adjacency_matrix = self.graph_spectrum[self.braess_travel_time_index]
 
@@ -581,7 +583,7 @@ class SimulationStarter:
             del data_to_be_added
 
         elif user_answer.upper() == "N":
-            print("This simulation has been ended, and exiting out of store_data_methdo.......")
+            print("This simulation has been ended, and exiting out of store_data_method.......")
 
         return None
 

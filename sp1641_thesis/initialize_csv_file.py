@@ -15,7 +15,7 @@ class DataStorage:
         self.file_path = "simulation_data.csv"
 
         if not os.path.exists(self.file_path):
-            self.__initialize_a_csv_file()
+            self.initialize_a_csv_file()
 
         self.existing_df = pd.read_csv(self.file_path)
 
@@ -31,7 +31,7 @@ class DataStorage:
              "Experiment Name"]
         )
 
-    def __initialize_a_csv_file(self):
+    def initialize_a_csv_file(self):
         initial_data = {
             "Initial Adjacency Matrix": [],
             "Braess Adjacency Matrix": [],
@@ -45,7 +45,7 @@ class DataStorage:
         }
 
         df = pd.DataFrame(initial_data)
-        df.to_csv("simulation_data.csv", mode='a', index=False, header=True)
+        df.to_csv(self.file_path, mode='a', index=False, header=True)
 
     def add_data(self, new_data: dict) -> None:
         new_df = pd.DataFrame(new_data)
@@ -139,7 +139,7 @@ class DataStorage:
         # "Graph Specturm": np.array([{edge->tuple:weight->int)}, {edge->tuple:weight->int)}]),
         # "All Average Travel Time": list->int,
         # "Number of Nodes": Int
-        # "Experiment Name": Int
+        # "Experiment Name": Str
         # }
 
         print("""
