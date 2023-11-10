@@ -277,9 +277,7 @@ class SimulationStarter:
     # ------------------------------------------------# Main function that does the simulation-------------------------------------------------------------------#
     def start_doing_simulation(self) -> None:
 
-        # Data collection
-        dict_representation_of_graph = self.my_data_storage_object.create_dict_representation(self.G)
-        self.graph_spectrum = np.append(self.graph_spectrum, dict_representation_of_graph)
+        self.collect_graphs()
 
         # We need the epoch to go till the graph becomes a complete graph.
         # The formula to obtain complete graph is num of edges = n(n-1)
@@ -369,8 +367,13 @@ class SimulationStarter:
                 my_bot.current_status = "inactive"
                 my_bot.current_epoch = 0
 
+
+
             # Growing the graph
             self.next_spectrum()
+
+            #Collecting Graphs for data collection
+            self.collect_graphs()
 
             current_num_of_edges = self.my_graph_object.get_current_number_of_edges()
 
@@ -500,7 +503,9 @@ class SimulationStarter:
         return None
 
     def forceful_affect_a_random_bot(self) -> None:
-        bot_name = random.randint(0, len(self.bot_dict.values()))
+        random_value = len(self.bot_dict.values())-1
+        bot_name = random.randint(0, random_value)
+        del random_value
         if (len(self.shortest_path) > 1):
             random_index = random.randint(0, len(self.shortest_path))
         else:
@@ -560,12 +565,42 @@ class SimulationStarter:
             user_answer = input("Store Data(Y/N): ")
 
         if user_answer.upper() == "Y":
-            number_of_bots = input("Number of Bots in Experimnet: ")
-            number_of_nodes = input("Number of Nodes in Experiment: ")
+            #Call function, to get certain value,
+            self.turn_data_to_proper_storage()
+
+
+            number_of_bots = str(self.num_of_bots) #input("Number of Bots in Experimnet: ")
+            number_of_nodes = str(self.number_of_nodes) #input("Number of Nodes in Experiment: ")
             experiment_number = input("What number experiment is this: ")
+
             experiment_name = number_of_bots + "BOTS" + number_of_nodes + "NODES"+experiment_number+"EXPERIMENT"
-            initial_adjacency_matrix = self.graph_spectrum[self.initial_travel_time_index]
-            braess_adjacency_matrix = self.graph_spectrum[self.braess_travel_time_index]
+
+            initial_adjacency_matrix = -1
+            braess_adjacency_matrix = -1
+            braess_paradox_exists=False
+
+            if self.braess_travel_time!=None:
+
+                try:
+                    initial_adjacency_matrix = self.graph_spectrum[self.initial_travel_time_index]
+                    braess_adjacency_matrix = self.graph_spectrum[self.braess_travel_time_index]
+                    braess_paradox_exists = True
+                except:
+                    print(self.initial_travel_time_index, "initial_travel_time_index")
+                    print(self.braess_travel_time_index, "braess_travel_time_index")
+                    print(len(self.graph_spectrum))
+                    print("Error jhas been recahed")
+
+            elif self.braess_travel_time==None:
+                braess_paradox_exists = False
+
+            if braess_paradox_exists:
+                print("Existence of Braess Paradox has been confirmed.")
+
+            elif not braess_paradox_exists:
+                print("Braess Paradox has not been detected in this simulation. ")
+
+
 
             data_to_be_added = {
                 "Initial Adjacency Matrix": [initial_adjacency_matrix],
@@ -576,7 +611,8 @@ class SimulationStarter:
                 "Graph Spectrum": [self.graph_spectrum],
                 "All Average Travel Time": [self.graph_spectrum_travel_time],
                 "Number of Nodes": [self.number_of_nodes],
-                "Experiment Name": [experiment_name]
+                "Experiment Name": [experiment_name],
+                "Braess Paradox Exists": [braess_paradox_exists]
             }
 
             self.my_data_storage_object.add_data(data_to_be_added)
@@ -585,6 +621,13 @@ class SimulationStarter:
         elif user_answer.upper() == "N":
             print("This simulation has been ended, and exiting out of store_data_method.......")
 
+        return None
+
+    #This function sole purpose is to collect graphs.
+    def collect_graphs(self)->None:
+        # Data collection
+        dict_representation_of_graph = self.my_data_storage_object.create_dict_representation(self.G)
+        self.graph_spectrum = np.append(self.graph_spectrum, dict_representation_of_graph)
         return None
 
     # Formatting the data gathered

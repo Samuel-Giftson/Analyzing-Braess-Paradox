@@ -28,7 +28,8 @@ class DataStorage:
              "Graph Spectrum",
              "All Average Travel Time",
              "Number of Nodes",
-             "Experiment Name"]
+             "Experiment Name",
+             "Braess Paradox Exists"]
         )
 
     def initialize_a_csv_file(self):
@@ -41,7 +42,8 @@ class DataStorage:
             "Graph Spectrum": [],
             "All Average Travel Time": [],
             "Number of Nodes": [],
-            "Experiment Name": []
+            "Experiment Name": [],
+            "Braess Paradox Exists": []
         }
 
         df = pd.DataFrame(initial_data)
@@ -56,11 +58,11 @@ class DataStorage:
     def retrieve_data(self):
         df1 = pd.read_csv(self.file_path)
 
-        #return df1
+        # return df1
         self.test_retrieval(df1)
-        #print(data_str)
-        #breakpoint()
-        #self.testing_if_data_stored_correctly(df1)
+        # print(data_str)
+        # breakpoint()
+        # self.testing_if_data_stored_correctly(df1)
 
     # FUNCTIONS TO TRANSLATE CSV DATA TO ORIGINIAL DATA STRUCTURE
     def create_dict_representation(self, G: nx.classes.digraph.DiGraph) -> dict:
@@ -86,9 +88,8 @@ class DataStorage:
         dict_list = re.findall(r'{[^}]*}', string)
         return np.array([eval(d) for d in dict_list])
 
-
-    #This function is used to convert an string in to numpy array, this is used for "All Average Travel Time" column.
-    def extract_numpy_array_from_string(self, s)->np.ndarray:
+    # This function is used to convert an string in to numpy array, this is used for "All Average Travel Time" column.
+    def extract_numpy_array_from_string(self, s) -> np.ndarray:
 
         # Remove leading and trailing brackets and spaces
         s = s.strip('[]').strip()
@@ -99,8 +100,8 @@ class DataStorage:
 
         return arr
 
-    #This function is used to convert a string that has one dicitonary in it. It works for the columns named
-    #Initial Adjaceny Matrix and Braess Adjacency Matrix
+    # This function is used to convert a string that has one dicitonary in it. It works for the columns named
+    # Initial Adjaceny Matrix and Braess Adjacency Matrix
     def turn_one_dict_string_ino_dict(self, my_string):
         output_dict = ast.literal_eval(my_string)
 
@@ -110,11 +111,11 @@ class DataStorage:
         my_returning_array = np.array([])
         string_list = string_list.split("\n")
 
-        #Clean the array first element
-        string_list[0] = string_list[0].replace("[","")
+        # Clean the array first element
+        string_list[0] = string_list[0].replace("[", "")
 
-        #Clean last element
-        string_list[-1] = string_list[-1].replace("]","")
+        # Clean last element
+        string_list[-1] = string_list[-1].replace("]", "")
 
         for i in string_list:
             string_convereted = self.turn_one_dict_string_ino_dict(i)
@@ -122,9 +123,6 @@ class DataStorage:
 
         del string_list
         return my_returning_array
-
-
-
 
     # This function made to provide reference of how data is stored in the csv file.
     def help_(self) -> None:
@@ -195,7 +193,7 @@ class DataStorage:
         """)
 
     # Test code----------------------------TEST CODES AND FUNCTIONS
-    #Testing if data stored properly in the csv file
+    # Testing if data stored properly in the csv file
     def test_retrieval(self, df):
         for i in df[self.columns_names[0]]:
             print(self.turn_one_dict_string_ino_dict(i))
@@ -221,7 +219,6 @@ class DataStorage:
         print("Column 4 finihsed")
         print(" ")
 
-
         t = df[self.columns_names[5]].values
         for i in t:
             my_array = self.column_five_element_translator(i)
@@ -243,6 +240,7 @@ class DataStorage:
             print(i)
 
         return None
+
     def testing_if_data_stored_correctly(self, data_str):
         # self.return_graph_from_dict_representation(data_str[self.columns_names[0]])
 
@@ -265,8 +263,6 @@ class DataStorage:
         print(self.columns_names[6], len(data_str[self.columns_names[6]]))
         print(self.columns_names[7], data_str[self.columns_names[7]])
         return None
-
-
 
     def testing(self):
         data = {"K": [1, 3], "L": [23, 23]}
