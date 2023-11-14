@@ -58,8 +58,10 @@ class DataStorage:
     def retrieve_data(self):
         df1 = pd.read_csv(self.file_path)
 
-        # return df1
-        self.test_retrieval(df1)
+
+
+        return df1
+        #self.test_retrieval(df1)
         # print(data_str)
         # breakpoint()
         # self.testing_if_data_stored_correctly(df1)
@@ -73,12 +75,12 @@ class DataStorage:
 
     def return_graph_from_dict_representation(self, G_dict: dict):
         G = nx.DiGraph()
-
         for i in G_dict:
             G.add_edge(i[0], i[1], weight=G_dict[i])
 
-        nx.draw(G, with_labels=True)
-        plt.show()
+        #nx.draw(G, with_labels=True)
+        #plt.show()
+        return G
 
     # FUNCTIONS THAT ARE USED TO TRANSLATE DATA STORED IN THE CSV FILE TO USABLE DATA
 

@@ -16,11 +16,14 @@ from initialize_csv_file import DataStorage
 
 
 class SimulationStarter:
-    def __init__(self, number_of_nodes=10, max_weight=0, min_weight=0, testing=False) -> None:
+    def __init__(self, number_of_nodes=10, max_weight=0, min_weight=0, testing=False, real_life_scenario_test = False) -> None:
         # Variables that are objects for the custom classes used in the simulation
         self.my_data_storage_object = DataStorage()
         self.my_graph_object = None
         self.my_linear_threhold_model_object = None
+
+        # VARIABLE THAT DETERMINES WHETHER TO INITIATE REALIF SCENARIO OR NOT
+        self.real_life_scenario_test = real_life_scenario_test
 
         # PARAMETERS REDEFINITION FOR TO OTHERS TO USE
         self.number_of_nodes = number_of_nodes
@@ -105,7 +108,11 @@ class SimulationStarter:
 
     # FUNCTIONS THAT ARE RELATED IN CREATION OF THE GRAPH, AND MAKING THE GRAPH GROW ARE HERE
     def start_making_graph(self) -> None:
-        self.my_graph_object = gg(self.number_of_nodes, self.max_weight, self.min_weight)
+        if self.real_life_scenario_test:
+            self.my_graph_object = gg(self.number_of_nodes, self.max_weight, self.min_weight, self.real_life_scenario_test)
+        elif not self.real_life_scenario_test:
+            self.my_graph_object = gg(self.number_of_nodes, self.max_weight, self.min_weight)
+
         self.copy_of_original_graph = self.my_graph_object.get_current_graph()
         self.G = self.my_graph_object.get_current_graph()
 

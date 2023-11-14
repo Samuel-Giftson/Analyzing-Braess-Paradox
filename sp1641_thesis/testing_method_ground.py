@@ -6,6 +6,7 @@ import numpy as np
 from initialize_csv_file import DataStorage
 from scipy.sparse import csr_matrix
 from graph_generator1 import GraphGenerator1 as gg
+from analyzing_results import AnalyzingResults
 
 
 my_data_storage_object = DataStorage()
@@ -49,5 +50,9 @@ my_data_storage_object.add_data(initial_data)
 
 
 # TESTING THE EXISTING CSV FILE NOW
-my_data_storage_object.retrieve_data()
-print("Done")
+#my_data_storage_object.retrieve_data()
+#print("Done")
+
+#Testing Analyzing Results
+my_analyzing_result_object = AnalyzingResults()
+my_analyzing_result_object.see_difference_of_braess_paradox_to_no_of_nodes()

@@ -2,28 +2,46 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random
 
+from starkville_graph import MainMSUCampusGraph
+
 
 class GraphGenerator1:
-    def __init__(self, number_of_nodes: int, max_edge_weight: int =0, min_edge_weight :int  =0) -> None:
-        self.number_of_nodes = number_of_nodes
-        self.G = nx.scale_free_graph(number_of_nodes)
+    def __init__(self, number_of_nodes: int, max_edge_weight: int =0, min_edge_weight :int  =0, realistic :bool = False) -> None:
+
+        #Variable Definition and prepare graphs
+
+        self.realistic = realistic
+
+        if not self.realistic:
+            self.number_of_nodes = number_of_nodes
+            self.G = nx.scale_free_graph(number_of_nodes)
+
+        else:
+            self.my_main_msu_graph_object = MainMSUCampusGraph()
+            self.G = self.my_main_msu_graph_object.load_graph()
+
         self.max_edge_weight= max_edge_weight
         self.min_edge_weight = min_edge_weight
 
-        # Clean the generated graph
-        self.__clean_the_graph()
+
+        if not self.realistic:
+            # Clean the generated graph
+            self.__clean_the_graph()
 
         # Finding the hubs
         self.__find_hubs()
 
-        # Focused graph holds the main scale free graph
-        self.focused_graph = self.G
+        if not self.realistic:
+            # Focused graph holds the main scale free graph
+            self.focused_graph = self.G
 
-        # spannig path graph
-        self.__span_path_graph()
+            # spannig path graph
+            self.__span_path_graph()
         self.begginning_of_the_spectrum = self.G
-        self.make_path_graph_into_unidirectional_graph()
-        self.add_weights_to_graph()
+
+        if not self.realistic:
+            self.make_path_graph_into_unidirectional_graph()
+            self.add_weights_to_graph()
 
         #Variable to determine the curent number of edges
         self.number_of_edges = len(self.G.edges())
