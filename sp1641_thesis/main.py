@@ -9,7 +9,10 @@ from linear_threshold_model import LinearThresholdModel as lt
 
 
 
-
-my_simulating_object = simulating(10, 100, 10, testing=False, real_life_scenario_test=False)
-del my_simulating_object
-
+for i in range(100):
+    try:
+        my_simulating_object = simulating(11, 0.5, 0.01, testing=False, real_life_scenario_test=True)
+        del my_simulating_object
+    except:
+        my_simulating_object = simulating(11, 0.5, 0.01, testing=False, real_life_scenario_test=True)
+        del my_simulating_object

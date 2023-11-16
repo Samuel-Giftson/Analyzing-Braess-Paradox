@@ -495,7 +495,6 @@ class SimulationStarter:
                     cost_of_traversing = self.G[bot.current_place][bot.current_destination]["weight"]
                     bot_current_epoch = amount_of_bots_heading_to_the_same_location * cost_of_traversing
                     bot.current_epoch += bot_current_epoch
-
             epochs += 1
 
     # MISCELLANEOUS FUNCTIONS THAT ARE NEEDED

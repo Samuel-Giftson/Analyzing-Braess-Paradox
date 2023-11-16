@@ -19,6 +19,8 @@ class GraphGenerator1:
         else:
             self.my_main_msu_graph_object = MainMSUCampusGraph()
             self.G = self.my_main_msu_graph_object.load_graph()
+            self.number_of_nodes = len(self.G.nodes())
+            print(self.number_of_nodes)
 
         self.max_edge_weight= max_edge_weight
         self.min_edge_weight = min_edge_weight
@@ -96,8 +98,13 @@ class GraphGenerator1:
 
             if random.random() < i[1]:
                 #--Testing Code---- print("reached here")
-                assigned_weight = random.randint(self.min_edge_weight, self.max_edge_weight)
-                self.G.add_edge(target_node, i[0], weight = assigned_weight )
+                if self.realistic:
+                    assigned_weight = round(random.uniform(self.min_edge_weight, self.max_edge_weight), 2)
+                    assigned_weight = int(assigned_weight *100)
+                    self.G.add_edge(target_node, i[0], weight = assigned_weight )
+                else:
+                    assigned_weight = random.randint(self.min_edge_weight, self.max_edge_weight)
+                    self.G.add_edge(target_node, i[0], weight = assigned_weight )
 
                 #If we are gonna keep  it realistic, we have
                 #add roads in out of city to city this makes

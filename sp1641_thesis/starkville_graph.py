@@ -11,7 +11,7 @@ class MainMSUCampusGraph:
         self.file_name = "msu_campus_graph.csv"
 
         #Default Graph unit measaurement
-        self.weights_unit = "feet"
+        self.weights_unit = "miles"
 
         if not os.path.exists(self.file_name):
             self.__initialize_a_csv_file()
@@ -22,7 +22,9 @@ class MainMSUCampusGraph:
     def __initialize_a_csv_file(self):
         my_data_storage_object = DataStorage()
 
-        G = self.__initiate_graph()
+        G = self.revised_graph() #self.__initiate_graph()
+        for i in G.edges():
+            print(G[i[0]][i[1]]["weight"])
         dict_representation = my_data_storage_object.create_dict_representation(G)
 
         initial_data = {
@@ -55,6 +57,9 @@ class MainMSUCampusGraph:
                             (15, 16): 1056, (16, 15): 1056,
                             (16, 4): 394, (4, 16): 394,
                             (14, 2): 1056, (2, 14): 1056,
+
+                            (10, 12):1964.16, (12, 10):1964.16
+
         }
         miles_edge_weight={ (1,2): 0.4, (2,1): 0.4,
                             (2,3): 0.2, (3,2): 0.2,
@@ -62,17 +67,34 @@ class MainMSUCampusGraph:
                             (4,5): 0.4, (5,4): 0.4,
                             (5, 6): 0.3, (6, 5): 0.3,
                             (6, 7): 0.3, (7, 6): 0.3,
-                            (7, 8): 0.0473485, (8, 7): 0.0473485,
-                            (8, 9): 0.253, (9, 8): 0.253,
+                            (7, 8): 0.05, (8, 7): 0.05,
+                            (8, 9): 0.25, (9, 8): 0.25,
                             (9, 10): 0.3, (10, 9): 0.3,
                             (10, 11): 0.3, (11, 10): 0.3,
-                            (11, 12): 0.072, (12, 11): 0.072,
+                            (11, 12): 0.1, (12, 11): 0.1,
                             (12, 13): 0.2, (13, 12): 0.2,
                             (13, 14): 0.1, (14, 13): 0.1,
                             (14, 15): 0.2, (15, 14): 0.2,
                             (15, 16): 0.2, (16, 15): 0.2,
-                            (16, 4): 0.07462, (4, 16): 0.07462,
+                            (16, 4): 0.1, (4, 16): 0.1,
                             (14, 2): 0.3, (2, 14): 0.3,
+
+                            (7, 9):0.3,(9, 7):0.3,
+
+                            (10, 12):0.3, (12, 10):0.3
+        }
+        revised_edge_miles_weight = {
+            (1, 2): 0.2, (2, 1): 0.2,
+            (2, 3): 0.2, (3, 2): 0.2,
+            (3, 4): 0.4, (4, 3): 0.4,
+            (4, 5): 0.3, (5, 4): 0.3,
+            (5, 6): 0.3, (6, 5): 0.3,
+            (6, 7): 0.3, (7, 6): 0.3,
+            (7, 8): 0.3, (8, 7): 0.3,
+            (8, 9): 0.3, (9, 8): 0.3,
+            (9, 10): 0.2, (10, 9): 0.2,
+            (10, 11): 0.1, (11, 10): 0.1,
+            (11, 1): 0.3, (1, 11): 0.3,
         }
         if units == "miles":
             return miles_edge_weight
@@ -81,7 +103,7 @@ class MainMSUCampusGraph:
 
     def __initiate_graph(self):
         G = nx.DiGraph()
-        G.add_edge(1, 2); G.add_edge(2, 1)
+        #G.add_edge(1, 2); G.add_edge(2, 1)
         G.add_edge(2, 3); G.add_edge(3, 2)
         G.add_edge(3, 4); G.add_edge(4, 3)
         G.add_edge(4, 5); G.add_edge(5, 4)
@@ -90,27 +112,27 @@ class MainMSUCampusGraph:
         G.add_edge(7, 8); G.add_edge(8, 7)
         G.add_edge(8, 9); G.add_edge(9, 8)
         G.add_edge(9, 10); G.add_edge(10, 9)
-        G.add_edge(10, 11); G.add_edge(11, 10)
-        G.add_edge(11, 12); G.add_edge(12, 11)
+        #G.add_edge(10, 11); G.add_edge(11, 10)
+        #G.add_edge(11, 12); G.add_edge(12, 11)
         G.add_edge(12, 13); G.add_edge(13, 12)
         G.add_edge(13, 14); G.add_edge(14, 13)
-        G.add_edge(14, 15); G.add_edge(15, 14)
-        G.add_edge(15, 16); G.add_edge(16, 15)
+        #G.add_edge(14, 15); G.add_edge(15, 14)
+        #G.add_edge(15, 16); G.add_edge(16, 15)
 
-        #Directed graph above, below other connections
-        G.add_edge(16, 4); G.add_edge(4, 16)
+        #Path graph above, below other connections
+        #G.add_edge(16, 4); G.add_edge(4, 16)
         G.add_edge(14, 2); G.add_edge(2, 14)
 
         #adding weights
         weight_dictionary = self.__feet_weights_dict(self.weights_unit)
 
             #-----------------ISSUE FIXED------------------
-        #print(len(weight_dictionary.keys()))------TEST CODE
+        #print(len(we88ight_dictionary.keys()))------TEST CODE
         #print(" ")--------------------------------TEST CODE
 
         for i in G.edges():
             print(i)
-            G[i[0]][i[1]]["weight"]=(weight_dictionary[i]*0.01)
+            G[i[0]][i[1]]["weight"]=(weight_dictionary[i]*100)
 
         #print(len(list(G.edges())))---------------TEST CODE
         #for i in weight_dictionary.keys():--------TEST CODE
@@ -134,3 +156,50 @@ class MainMSUCampusGraph:
         plt.show()
 
 
+
+    def revised_graph(self):
+        G = nx.DiGraph()
+        G.add_edge(
+            0, 1); G.add_edge(0, 1)
+        G.add_edge(3, 4); G.add_edge(4, 3)
+        G.add_edge(4, 5); G.add_edge(5, 4)
+        G.add_edge(5, 6); G.add_edge(6, 5)
+        G.add_edge(6, 7); G.add_edge(7, 6)
+        #G.add_edge(7, 8); G.add_edge(8, 7)
+        G.add_edge(7, 9); G.add_edge(9, 7)
+        G.add_edge(9, 10); G.add_edge(10, 9)
+        G.add_edge(12, 10); G.add_edge(10, 12)
+        G.add_edge(12, 13); G.add_edge(13, 12)
+        G.add_edge(13, 14); G.add_edge(14, 13)
+        G.add_edge(14, 2); G.add_edge(2, 14)
+        p="""
+        G.add_edge(2, 3); G.add_edge(3, 2)
+        G.add_edge(3, 4); G.add_edge(4, 3)
+        G.add_edge(4, 5); G.add_edge(5, 4)
+        G.add_edge(5, 6); G.add_edge(6, 5)
+        G.add_edge(6, 7); G.add_edge(7, 6)
+        #G.add_edge(7, 8); G.add_edge(8, 7)
+        G.add_edge(7, 9); G.add_edge(9, 7)
+        G.add_edge(9, 10); G.add_edge(10, 9)
+        G.add_edge(12, 10); G.add_edge(10, 12)
+        G.add_edge(12, 13); G.add_edge(13, 12)
+        G.add_edge(13, 14); G.add_edge(14, 13)
+        G.add_edge(14, 2); G.add_edge(2, 14)
+        """
+        # adding weights
+        weight_dictionary = self.__feet_weights_dict(self.weights_unit)
+
+        # -----------------ISSUE FIXED------------------
+        # print(len(we88ight_dictionary.keys()))------TEST CODE
+        # print(" ")--------------------------------TEST CODE
+
+        for i in G.edges():
+            print(i)
+            G[i[0]][i[1]]["weight"] = int((weight_dictionary[i] * 100))
+
+        # print(len(list(G.edges())))---------------TEST CODE
+        # for i in weight_dictionary.keys():--------TEST CODE
+        #    if i not in list(G.edges()):----------TEST CODE
+        #        print(i)--------------------------TEST CODE
+
+        return G
