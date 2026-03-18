@@ -51,7 +51,7 @@ This project addresses the problem by combining simulation and machine learning 
 
 ---
 
-## 🔬 Key Contribution
+## Key Contribution
 
 This project introduces a **simulation-driven data generation framework** for studying the Braess Paradox.
 
