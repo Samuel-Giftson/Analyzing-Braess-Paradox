@@ -1,122 +1,171 @@
-# Network Optimization & Braess Paradox Analysis
+# Exploring the Relationship Between Network Topology and the Braess Paradox
 
-A simulation-driven system that analyzes network performance and predicts when increasing connectivity can reduce overall efficiency.
+**M.S. Thesis — Samuel Giftson Prabhakar**
+**Mississippi State University, Department of Computer Science and Engineering**
+**March 2024 | Advisor: Dr. Zhiqian Chen**
 
----
-
-## Overview
-
-In many real-world systems, adding more capacity does not always improve performance.  
-In certain conditions, it can lead to worse outcomes due to decentralized decision-making.
-
-This phenomenon, known as the **Braess Paradox**, appears in:
-- Transportation systems
-- Network routing
-- Power grids
-- Distributed and multi-agent systems
-
-This project addresses the problem by combining simulation and machine learning to identify inefficient network configurations.
+> Published thesis available via Mississippi State University Theses and Dissertations, No. 6160.
 
 ---
 
-## What This System Does
+## The Problem
 
-- Simulates network behavior using autonomous agents (selfish routing)
-- Evaluates performance as edges are added to the network
-- Detects when additional connections reduce efficiency
-- Generates structured data from simulations
-- Trains a Graph Neural Network (GNN) to predict inefficient network designs
+Traffic congestion in the United States costs **$94.6 billion per year** (2021) and is projected to exceed **$120 billion** annually. The instinctive engineering response — build more roads, add more connections — does not always help. In fact, under specific conditions, adding a new road to a network can make travel times *worse for everyone*.
 
----
+This phenomenon is known as the **Braess Paradox**, and it has been observed in real-world systems:
+- Stuttgart, Germany — closing a central road *reduced* city-wide travel time
+- Seoul, South Korea — removing an elevated highway *improved* traffic flow
+- New York City — closing Broadway to vehicles improved surrounding traffic patterns
 
-## Architecture
-
-### Components
-
-- **Graph Generator**
-  - Produces directed, weighted, scale-free networks
-  - Reflects real-world topology patterns
-
-- **Simulation Engine**
-  - Agents independently choose optimal paths
-  - Measures system-wide performance under changing conditions
-
-- **Data Pipeline**
-  - Captures graph states and outcomes
-  - Builds datasets for training
-
-- **GNN Model**
-  - Learns structural patterns in graphs
-  - Predicts likelihood of Braess Paradox occurrence
+The paradox arises from **decentralized, selfish decision-making**: when every traveler independently picks the route that seems best for them, the collective outcome can be suboptimal. Understanding *when* and *why* this happens requires studying the relationship between network structure and agent behavior — which is exactly what this project addresses.
 
 ---
 
-## Key Contribution
+## What This Research Does
 
-This project introduces a **simulation-driven data generation framework** for studying the Braess Paradox.
+This project investigates: **at what point in a network's growth does the Braess Paradox appear, and can a machine learning model predict it?**
 
-While most existing approaches focus on analytical or fixed-network scenarios, this system:
-- Programmatically generates diverse network conditions  
-- Simulates agent behavior at scale  
-- Produces data suitable for machine learning models  
+The approach is empirical rather than purely analytical — most prior work on the Braess Paradox relies on fixed, hand-crafted networks. This system instead:
 
----
-
-## Key Outcomes
-
-- Identified conditions where increasing connectivity leads to reduced efficiency  
-- Built a scalable simulation framework for network analysis  
-- Generated datasets for training graph-based models  
-- Developed a predictive model for identifying high-risk network structures  
+1. **Programmatically generates** diverse directed weighted scale-free networks (reflecting real-world topology patterns like road systems and power grids)
+2. **Grows each network incrementally** from a base scale-free structure toward a complete graph, adding edges one at a time
+3. **Simulates 100 autonomous agents (bots)** traversing the network at each growth stage, each independently selecting their optimal path
+4. **Detects the Braess Paradox** by measuring whether average travel time *increases* as new edges are added
+5. **Trains a Graph Neural Network (GNN)** on the resulting dataset to predict which graph configurations are at risk of triggering the paradox
 
 ---
 
-## Business Value
+## Simulation Design
 
-This approach can support decision-making in:
+Each simulation is far more than a simple routing exercise. It layers two interacting models:
 
-- Traffic system design — avoid infrastructure changes that worsen congestion  
-- Network routing — improve efficiency in distributed systems  
-- Power grid expansion — reduce risk in infrastructure scaling  
-- Multi-agent systems — understand behavior under decentralized control  
+### Agent Routing (Selfish Path Selection)
+- 100 bots are placed on a directed weighted graph, each with a random source and destination
+- Each bot independently selects its shortest available path (simulating selfish routing behavior)
+- Bots move epoch by epoch; edge weights update dynamically based on congestion (number of bots currently traversing the edge)
+- Travel time is recorded per bot per simulation; average travel time across all bots is the key metric
+
+### Influence Maximization via Linear Threshold Model
+- A secondary social network (scale-free bot network) models how routing *information* spreads between agents
+- The Linear Threshold Model propagates influence across this network until 70% of bots adopt updated routing knowledge
+- This captures how real-world travelers adapt their behavior based on information from others (navigation apps, word of mouth, etc.)
+
+### Graph Growth Spectrum
+- Each simulation does not test a single graph — it tests the **full spectrum** of graph states, from the initial scale-free topology up to a directed weighted complete graph
+- At each incremental edge addition, the full simulation (100 bots × multiple epochs) is re-run
+- This produces a curve of average travel time vs. number of edges — the Braess Paradox appears as an *increase* in that curve after a new edge is added
+
+### Computational Scale
+Each top-level simulation involves:
+- ~40,000+ individual agent-level operations (bot movements, path recalculations, edge weight updates)
+- ~35,000 edge propagation operations from the Linear Threshold Model
+- Repeated across the full graph growth spectrum (multiple edge-addition stages)
+
+The cumulative dataset already contains **4.3 million+ recorded simulation states**, representing hundreds of billions of individual agent decisions — providing statistically robust grounding for the findings.
+
+---
+
+## Key Findings
+
+Experiments were conducted across graph sizes of **8, 9, 10, and 11 nodes**, each tested with 100 bots:
+
+- The Braess Paradox was **consistently observed** as graphs grew from scale-free toward complete
+- The paradox tends to emerge at a **specific density threshold** — not at the beginning or end of graph growth, but at an intermediate point
+- Larger graphs (more nodes) produced **more frequent and more pronounced** Braess Paradox occurrences
+- A **real-world test case** using the Mississippi State University campus road network (Starkville, MS) confirmed the findings extend beyond synthetic graphs
+- The trained **Graph Neural Network** successfully learned to identify structural features associated with paradox-triggering configurations
+
+---
+
+## System Architecture
+
+```
+graph_generator1.py          — Directed weighted scale-free graph generation and edge-by-edge growth
+simulation_starter.py        — Core simulation engine: bot routing, path assignment, travel time tracking
+bot_class.py                 — Individual agent (bot) representation
+linear_threshold_model.py    — Information spread model across the bot social network
+initialize_csv_file.py       — Data pipeline: structured storage of simulation results
+Braess_detector_based_on_data.py — GNN training and Braess Paradox prediction
+analyzing_results.py         — Post-simulation statistical analysis and visualization
+starkville_graph.py          — Real-world MSU campus road network test case
+main.py                      — Entry point: runs simulation trials
+```
 
 ---
 
 ## Technologies
 
-- Python  
-- Network simulation (custom-built engine)  
-- Graph modeling  
-- Machine Learning (Graph Neural Networks)  
-- Data processing and analysis  
+| Component | Technology |
+|---|---|
+| Language | Python 3 |
+| Graph modeling & algorithms | NetworkX |
+| Agent simulation | Custom-built multi-agent engine |
+| Social influence model | Linear Threshold Model (custom implementation) |
+| Data pipeline | pandas, CSV |
+| Machine learning | PyTorch, Graph Neural Networks (GNN) |
+| Graph topology | Scale-free networks (Barabási–Albert model) |
+| Real-world data | Mississippi State University campus road network |
 
 ---
 
-## Future Enhancements
+## How to Run
 
-- Real-time simulation with dynamic inputs  
-- Integration with real-world datasets  
-- Reinforcement learning for adaptive routing strategies  
-- Scaling experiments to larger graph sizes  
+```bash
+# Run simulation trials
+python main.py
+
+# Analyze results
+python analyzing_results.py
+
+# Train GNN on generated data
+python Braess_detector_based_on_data.py
+```
+
+Simulation output is stored as CSV and used as input for the GNN training pipeline.
 
 ---
 
-## Research Basis
+## Research Significance
 
-This project is based on a research study exploring the relationship between network topology and the occurrence of the Braess Paradox, with a focus on simulation-driven analysis and predictive modeling.
+This project makes the following contributions:
+
+1. **Empirical methodology**: Unlike most Braess Paradox research which uses fixed analytical networks, this system generates and tests thousands of diverse network configurations programmatically
+2. **Scale-free focus**: Real-world infrastructure networks (roads, internet, power grids) follow scale-free topology — this work specifically studies the paradox within that context
+3. **Dual-model simulation**: The combination of selfish routing with a social influence layer (Linear Threshold Model) adds a layer of behavioral realism not present in classical Braess analyses
+4. **ML-driven prediction**: The GNN provides a practical tool for identifying at-risk network designs *before* infrastructure is built, with direct implications for urban planning and network engineering
+5. **Real-world validation**: Findings were validated on an actual road network, not just synthetic graphs
+
+---
+
+## Applications
+
+This framework and its findings have direct relevance to:
+
+- **Transportation planning** — identify which road additions will worsen congestion before breaking ground
+- **Internet routing** — detect configurations where added bandwidth paradoxically reduces throughput
+- **Power grid design** — avoid infrastructure expansions that increase system-wide energy loss
+- **Multi-agent systems** — understand emergent inefficiency in any system where agents make independent, selfish decisions
+
+---
+
+## Future Work
+
+- Scaling experiments to larger graph sizes (15+ nodes) via parallelization
+- Integration with real-time traffic data feeds
+- Reinforcement learning for cooperative (non-selfish) routing strategies that avoid paradox conditions
+- Extension to dynamic graphs where edge weights change over time
+
+---
+
+## Citation
+
+Prabhakar, Samuel Giftson. *Exploring the Relationship Between Network Topology and Braess' Paradox*. M.S. Thesis, Mississippi State University, 2024. Mississippi State University Theses and Dissertations, No. 6160.
 
 ---
 
 ## Author
 
-Samuel Prabhakar  
-M.S. Computer Science  
-
----
-
-## Summary
-
-This project demonstrates how simulation and machine learning can be combined to detect non-intuitive inefficiencies in complex networks, enabling better design decisions in real-world systems.
-
-# Analyzing-Braess-Paradox
-This program was developed to support the research presented in the thesis "Exploring the Relationship Between Network Topology and Braess' Paradox" (2024), available via Mississippi State University Theses and Dissertations, No. 6160.
+**Samuel Giftson Prabhakar**
+M.S. Computer Science — Mississippi State University
+Major Professor: Dr. Zhiqian Chen
+Committee: Dr. Jingdao Chen, Dr. Vaidyanathan Sivaraman, Dr. Snehalatha Ballamoole
